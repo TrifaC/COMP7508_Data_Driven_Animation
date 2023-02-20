@@ -15,6 +15,9 @@ def part1_show_T_pose(viewer, joint_names, joint_parents, joint_offsets):
     joint_parents:  Shape - (J)     a list to store the parent index of each joint, -1 means no parent
     joint_offsets:  Shape - (J, 1, 3)  an array to store the local offset to the parent joint
     '''
+    print(joint_names)
+    print(joint_parents)
+    print(joint_offsets)
     global_joint_position = np.zeros((len(joint_names), 3))
     for joint_idx, parent_idx in enumerate(joint_parents):
         '''
@@ -37,11 +40,13 @@ def part1_show_T_pose(viewer, joint_names, joint_parents, joint_offsets):
                    else, the current joint global position = the sum of all parent joint offsets
         '''
         ########## Code Start ############
-
-
+        if parent_idx != -1:
+            global_joint_position[joint_idx] = np.add(global_joint_position[parent_idx], joint_offsets[joint_idx])
+        else:
+            global_joint_position[joint_idx] = np.add(joint_offsets[joint_idx], np.zeros(3))
         ########## Code End ############
         viewer.set_joint_position_by_name(joint_names[joint_idx], global_joint_position[joint_idx])
-
+    print(global_joint_position)
     viewer.run()
 
 
