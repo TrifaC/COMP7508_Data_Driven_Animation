@@ -90,12 +90,24 @@ def part2_forward_kinametic(viewer, joint_names, joint_parents, joint_offsets, j
     '''
     ########## Code Start ############
     for frame_index in range(frame_number):
+
+        # Get the current frame joint position and rotation.
+        joint_positions_in_frame = joint_positions[frame_index]
+        joint_rotations_in_frame = joint_rotations[frame_index]
+        # P(n)
+        global_joint_positions[frame_index] = joint_positions_in_frame
+        # R(n)
+        global_joint_orientations[frame_index] = joint_rotations_in_frame
         for joint_index, parent_index in enumerate(joint_parents):
-            global_joint_orientations[frame_index][joint_index] = joint_rotations[frame_index][joint_index]
             if parent_index != -1:
-                global_joint_positions[joint_index] = np.add(joint_positions[frame_index][parent_index], joint_offsets[joint_index])
-            else:
-                global_joint_positions[joint_index] = np.add(joint_offsets[joint_index], np.zeros(3))
+                # current joint rotation.
+                # Get Q(n-1)(The rotation from parent)
+                joint_rotations_in_frame_quat = R.from_quat(global_joint_orientations[frame_index][parent_index])
+                # Q(n-1)(The rotation from parent) * L(n-1)(The offset from parent)
+                rotated_joint_offset = joint_rotations_in_frame_quat.apply(joint_offsets[joint_index])
+                # P(n-1)parent position + Q(n-1)L(n-1)rotated offset
+                global_joint_positions[frame_index][joint_index] = np.add(global_joint_positions[frame_index][parent_index], rotated_joint_offset)
+                global_joint_orientations[frame_index][joint_index] = (R.from_quat(global_joint_orientations[frame_index][parent_index]) * R.from_quat(global_joint_orientations[frame_index][joint_index])).as_quat()
     ########## Code End ############
     if not show_animation:
         show_frame_idx = 0
