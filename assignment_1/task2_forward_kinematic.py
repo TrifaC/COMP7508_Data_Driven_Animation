@@ -1,5 +1,5 @@
-# Name:  
-# UID:  
+# Name:  CHEUNG Kai Sum
+# UID:  3035471210
 
 import numpy as np
 from scipy.spatial.transform import Rotation as R

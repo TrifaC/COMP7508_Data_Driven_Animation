@@ -22,6 +22,12 @@ class MetaData:
             path2: a list of joint indices from ROOT to End joint
     '''
     def __init__(self, joint_name, joint_parent, joint_initial_position, root_joint, end_joint):
+        # print("==================== MetaData ====================")
+        # print("The joint name is ", joint_name)
+        # print("The joint parent is ", joint_name)
+        # print("The joint initial position is ", joint_initial_position)
+        # print("The root joint is ", root_joint)
+        # print("The end joint is ", end_joint)
         self.joint_name = joint_name
         self.joint_parent = joint_parent
         self.joint_initial_position = joint_initial_position
@@ -68,6 +74,9 @@ def inverse_kinematics(meta_data, global_joint_positions, global_joint_orientati
         iteration_num = 20
         end_joint_name = meta_data.end_joint
         end_idx = path_name.index(end_joint_name)
+        print("==================== end joint info ====================")
+        print("end joint name is ", end_joint_name)
+        print("end joint index is ", end_idx)
         for _ in range(iteration_num):
             for current_idx in range(end_idx - 1, 0, -1):
                 '''
@@ -94,8 +103,33 @@ def inverse_kinematics(meta_data, global_joint_positions, global_joint_orientati
                 '''
                 
                 ########## Code Start ############
-                
 
+                # Preparation: Get the position of the rotate joint.
+                # Preparation: Get the position of the target.
+                # Preparation: Get the position of the end joint.
+                current_rotating_joint_position = global_joint_positions[current_idx]
+                target_position = target_pose
+                end_joint_position = global_joint_positions[end_idx]
+
+                print("==================== Preparation ====================")
+                print("The rotate joint position is ", current_rotating_joint_position)
+                print("The target position is ", target_position)
+                print("The end joint position is ", end_joint_position)
+
+                # Stage 1. Find the vectors.
+                vector_current_rotating_to_target = norm(target_position - current_rotating_joint_position)
+                vector_current_rotating_to_end = norm(end_joint_position - current_rotating_joint_position)
+                print("==================== Normalized Vectors ====================")
+                print("From current rotating to target ", vector_current_rotating_to_target)
+                print("From current rotating to end ", vector_current_rotating_to_end)
+
+                # Stage 2. Find the angle between two vector.
+                angle_to_rotate = np.arccos(np.vdot(vector_current_rotating_to_end, vector_current_rotating_to_target))
+                print("==================== Angle To Rotate ====================")
+                print("The angle to rotate is ", angle_to_rotate)
+
+                # Stage 3. Construct the ration function.
+                # Stage 4. Update the orientation.
 
 
 
