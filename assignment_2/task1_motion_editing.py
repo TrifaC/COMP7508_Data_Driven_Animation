@@ -40,13 +40,16 @@ def interpolation(left_data, right_data, t, method='linear', return_first_key=Tr
             * Don't take the last frame of slerp, because it is the same as the right_data
     '''
     ########## Code Start ############
+    print("==================== Interpolation: Run. ====================")
     if method == 'linear':
-        
-        
+        for i in range(1, t):
+            frame_between = left_data + (right_data - left_data) * (i / t)
+            res.append(frame_between)
         return res
     elif method == 'slerp':
-        
-        
+        # for i in range(1, t):
+        #     frame_between = left_data + (right_data - left_data) * (i / t)
+        #     res.append(frame_between)
         return res
     ########## Code End ############
 
@@ -60,7 +63,7 @@ def part1_key_framing(viewer, time_step, target_step):
     
     previous_frame_idx = 0
     for current_frame_idx in keyframes[1:]:
-        between_local_pos = interpolation(motion.local_joint_positions[previous_frame_idx], 
+        between_local_pos = interpolation(motion.local_joint_positions[previous_frame_idx],
                                           motion.local_joint_positions[current_frame_idx], 
                                           target_step - 1, 'linear')
         between_local_rot = interpolation(motion.local_joint_rotations[previous_frame_idx], 
@@ -181,11 +184,11 @@ def part2_concatenate(viewer, between_frames, example=False):
 def main():
     viewer = SimpleViewer()  
    
-    # part1_key_framing(viewer, 10, 10)
+    part1_key_framing(viewer, 10, 10)
     # part1_key_framing(viewer, 10, 5)
     # part1_key_framing(viewer, 10, 20)
     # part1_key_framing(viewer, 10, 30)
-    part2_concatenate(viewer, between_frames=8, example=True)
+    # part2_concatenate(viewer, between_frames=8, example=True)
     # part2_concatenate(viewer, between_frames=8)  
     viewer.run()
 
