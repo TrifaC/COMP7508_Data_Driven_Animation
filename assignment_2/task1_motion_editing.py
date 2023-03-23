@@ -42,14 +42,29 @@ def interpolation(left_data, right_data, t, method='linear', return_first_key=Tr
     ########## Code Start ############
     print("==================== Interpolation: Run. ====================")
     if method == 'linear':
-        for i in range(1, t):
-            frame_between = left_data + (right_data - left_data) * (i / t)
+        # iterate each frame between the start and end.
+        for frame_index in range(1, t):
+            frame_between = left_data + (right_data - left_data) * (frame_index / t)
             res.append(frame_between)
         return res
     elif method == 'slerp':
-        # for i in range(1, t):
-        #     frame_between = left_data + (right_data - left_data) * (i / t)
-        #     res.append(frame_between)
+        # Create a nd array, with t frames, 25 joints and a quaternion.
+        tmp_frame_data_set = np.zeros((t-1, 25, 4))
+        # Remember to set the left data.
+        tmp_frame_data_set[0] = res[0]
+        # iterate each joint of the character.
+        for joint_index, joint_quaternion in enumerate(left_data):
+            key_rotation = R.from_quat([left_data[joint_index], right_data[joint_index]])
+            key_frame_timestamps = [0, 1]
+            slerp = Slerp(key_frame_timestamps, key_rotation)
+            new_key_frames = np.linspace(0, 1, t+1)
+            interpolation_rotation = slerp(new_key_frames)
+            # after get the interpolation rotation of each frame, we should split the value of each joint.
+            for frame_index in range(1, t-1):
+                # assign the frame joint value from the joints value of all frame.
+                tmp_frame_data_set[frame_index][joint_index] = interpolation_rotation.as_quat()[frame_index]
+        for frame_between in tmp_frame_data_set:
+            res.append(frame_between)
         return res
     ########## Code End ############
 
@@ -183,11 +198,11 @@ def part2_concatenate(viewer, between_frames, example=False):
 
 def main():
     viewer = SimpleViewer()  
-   
-    part1_key_framing(viewer, 10, 10)
+
+    # part1_key_framing(viewer, 10, 10)
     # part1_key_framing(viewer, 10, 5)
     # part1_key_framing(viewer, 10, 20)
-    # part1_key_framing(viewer, 10, 30)
+    part1_key_framing(viewer, 10, 30)
     # part2_concatenate(viewer, between_frames=8, example=True)
     # part2_concatenate(viewer, between_frames=8)  
     viewer.run()
